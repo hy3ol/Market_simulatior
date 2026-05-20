@@ -47,7 +47,7 @@ git clone https://github.com/<USER>/Market_simulatior.git
 cd Market_simulatior
 
 # 가상환경
-py -3 -m venv .venv
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
 # 정책 오류 시 (PowerShell이 스크립트 차단할 때, 1회만)
@@ -64,7 +64,7 @@ pip install -r requirements.txt
 git clone https://github.com/<USER>/Market_simulatior.git
 cd Market_simulatior
 
-py -3 -m venv .venv
+python -m venv .venv
 .venv\Scripts\activate.bat
 
 python -m pip install --upgrade pip
@@ -140,7 +140,7 @@ python -m src.simulator --days 7 --inject-anomalies
 python -m src.simulator --days 7 --store-level
 ```
 
-Windows에서도 동일. `py -m src.simulator ...`도 가능.
+Windows에서도 동일 (`python -m src.simulator ...`).
 
 ### CLI 옵션
 
