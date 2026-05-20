@@ -1,0 +1,104 @@
+# 점포 업종 mix + baseline 프로파일 (Plan v0.2 §2.4, §5)
+# leak_threshold_mA: 누설전류 알람 임계 (15=습기 업종, 30=일반)
+# load_kw_*: 부하 전력 (전류 환산 base = kw * 4.5 A/kW @ 220V, 단상)
+# water_lpm_*: 정상 유량 평균 (L/min)
+# Q_baseline_lpm: 영업외 시간(야간) 기본 누수성 흐름 0~0.05 L/min 노이즈
+
+mix:
+  - category: "wet_meat"        # 정육/분식 등 습기 + 고전력
+    weight: 0.25
+    leak_threshold_mA: 15
+    load_kw_day: 3.5
+    load_kw_night: 0.4
+    water_lpm_day: 4.0
+    water_lpm_night: 0.05
+    has_inverter: true          # N1 false-trip 후보
+    daily_open_hour: 7
+    daily_close_hour: 21
+  - category: "deli_fry"        # 전/튀김
+    weight: 0.10
+    leak_threshold_mA: 15
+    load_kw_day: 4.5
+    load_kw_night: 0.5
+    water_lpm_day: 2.0
+    water_lpm_night: 0.03
+    has_inverter: true
+    daily_open_hour: 8
+    daily_close_hour: 21
+  - category: "produce"         # 청과/채소
+    weight: 0.15
+    leak_threshold_mA: 30
+    load_kw_day: 1.0
+    load_kw_night: 0.2
+    water_lpm_day: 1.5
+    water_lpm_night: 0.02
+    has_inverter: false
+    daily_open_hour: 6
+    daily_close_hour: 20
+  - category: "dry_apparel"     # 의류/잡화
+    weight: 0.20
+    leak_threshold_mA: 30
+    load_kw_day: 0.8
+    load_kw_night: 0.1
+    water_lpm_day: 0.1
+    water_lpm_night: 0.01
+    has_inverter: false
+    daily_open_hour: 9
+    daily_close_hour: 21
+  - category: "bakery"          # 떡/제과
+    weight: 0.10
+    leak_threshold_mA: 30
+    load_kw_day: 2.5
+    load_kw_night: 0.3
+    water_lpm_day: 0.8
+    water_lpm_night: 0.02
+    has_inverter: true
+    daily_open_hour: 7
+    daily_close_hour: 20
+  - category: "seasonal"        # 계절 업종 (여름 빙수/팥빙수 등)
+    weight: 0.08
+    leak_threshold_mA: 30
+    load_kw_day: 3.0
+    load_kw_night: 0.3
+    water_lpm_day: 1.5
+    water_lpm_night: 0.02
+    has_inverter: true
+    daily_open_hour: 10
+    daily_close_hour: 22
+    seasonal_boost_months: [6, 7, 8]  # 여름 +50%
+  - category: "other"
+    weight: 0.12
+    leak_threshold_mA: 30
+    load_kw_day: 1.2
+    load_kw_night: 0.2
+    water_lpm_day: 0.5
+    water_lpm_night: 0.02
+    has_inverter: false
+    daily_open_hour: 9
+    daily_close_hour: 20
+
+# 공통 noise / 환경 파라미터
+noise:
+  ar1_phi: 0.6           # AR(1) 계수
+  ar1_sigma_frac: 0.03   # 신호 평균 대비 표준편차 비율
+  gaussian_sigma_frac: 0.01
+
+environment:
+  # 여름 기준 일평균 사이클 (시간별 보정은 sin 결합)
+  temp_c_mean: 27.0
+  temp_c_amp: 6.0
+  humidity_mean: 70.0
+  humidity_amp: 20.0
+  # 장마 — 며칠간 humidity > 80% 지속
+  rain_days: [4, 5, 11, 12, 18]  # 시뮬레이션 day-of-month (0-indexed)
+
+# 주말 부하 배수 — 전통시장은 주말 유동인구 ↑↑
+weekly:
+  weekend_load_mult: 1.4
+  weekend_water_mult: 1.3
+  holiday_dates: []  # YYYY-MM-DD
+
+# 정상 영업 시간대 base 누설 (mA) — 안전 마진 안쪽
+leakage_baseline_mA:
+  wet: 3.0
+  dry: 0.8

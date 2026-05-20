@@ -1,0 +1,93 @@
+# 전주 남부시장 토폴로지 — 실제 지도 기반 (1~10동 + 청년몰)
+# 전기 계통: 한전 변압기(TR) → 시장 메인분전반(MDP) → 동별 SDP → 점포
+# 점포 수는 실측 부재로 동 면적 비율 추정치. 코드 변경 없이 yaml로 보정 가능.
+market:
+  name: "전주 남부시장"
+  season: "summer"
+  start_date: "2026-07-01"
+  pipe_main_length_m: 200      # 동 수도 메인
+  pipe_branch_length_m: 10     # 점포 분기
+  inter_dong_pipe_length_m: 50
+
+  # 전기 계통
+  transformer_id: "TR-MAIN"
+  mdp_id: "MDP-01"
+  mdp_trip_threshold_mA: 300
+
+dongs:
+  # 동쪽(오른쪽) 컬럼 — 풍남문/한옥마을 방면
+  - id: "D1"
+    name: "1동"
+    n_stores: 12
+    n_panels: 2
+    main_water_meter: "WM_D1"
+    panel_trip_threshold_mA: 100
+  - id: "D2"
+    name: "2동"
+    n_stores: 14
+    n_panels: 2
+    main_water_meter: "WM_D2"
+    panel_trip_threshold_mA: 100
+  - id: "D3"
+    name: "3동"
+    n_stores: 12
+    n_panels: 2
+    main_water_meter: "WM_D3"
+    panel_trip_threshold_mA: 100
+
+  # 중앙 컬럼
+  - id: "D4"
+    name: "4동"
+    n_stores: 8
+    n_panels: 1
+    main_water_meter: "WM_D4"
+    panel_trip_threshold_mA: 100
+  - id: "D5"
+    name: "5동"            # 시장 중앙 — 가장 큰 동
+    n_stores: 16
+    n_panels: 3
+    main_water_meter: "WM_D5"
+    panel_trip_threshold_mA: 100
+  - id: "D6"
+    name: "6동"
+    n_stores: 12
+    n_panels: 2
+    main_water_meter: "WM_D6"
+    panel_trip_threshold_mA: 100
+
+  # 서쪽(왼쪽) 컬럼
+  - id: "D7"
+    name: "7동"
+    n_stores: 12
+    n_panels: 2
+    main_water_meter: "WM_D7"
+    panel_trip_threshold_mA: 100
+  - id: "D8"
+    name: "8동"
+    n_stores: 10
+    n_panels: 1
+    main_water_meter: "WM_D8"
+    panel_trip_threshold_mA: 100
+  - id: "D9"
+    name: "9동"
+    n_stores: 8
+    n_panels: 1
+    main_water_meter: "WM_D9"
+    panel_trip_threshold_mA: 100
+  - id: "D10"
+    name: "10동"
+    n_stores: 8
+    n_panels: 1
+    main_water_meter: "WM_D10"
+    panel_trip_threshold_mA: 100
+
+  # 상단 분리 구역
+  - id: "DM"
+    name: "청년몰"
+    n_stores: 10
+    n_panels: 1
+    main_water_meter: "WM_DM"
+    panel_trip_threshold_mA: 100
+
+# 수도 야간 최소유량 (Minimum Night Flow) 정상 한계 (L/min/km)
+mnf_threshold_lpm_per_km: 1.0

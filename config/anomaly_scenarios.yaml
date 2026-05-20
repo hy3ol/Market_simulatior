@@ -1,0 +1,92 @@
+# 이상 시나리오 (Plan v0.2 §6)
+# 채널-무관 패턴 라이브러리. injection 시 (store, channel) 선택.
+
+scenarios:
+  A1_drift:
+    pattern: "drift"
+    weight: 4
+    label_kind: "range"
+    duration_minutes_range: [45, 480]    # 45m ~ 8h (짧은 drift도 포함)
+    severity_range: [0.5, 2.5]           # 시간당 ε 배수 (baseline의 % 단위)
+    target_channels: ["I_leak", "Q"]
+    channel_mix: {I_leak: 0.5, Q: 0.5}
+
+  A2_spike:
+    pattern: "spike"
+    weight: 3
+    label_kind: "point_plus_range"
+    duration_seconds_range: [1, 300]
+    severity_range: [3.0, 12.0]          # baseline 대비 배수
+    target_channels: ["I_leak", "I_load", "Q", "P"]
+    channel_mix: {I_leak: 0.4, I_load: 0.2, Q: 0.3, P: 0.1}
+
+  A3_intermittent:
+    pattern: "intermittent"
+    weight: 2
+    label_kind: "range_gated"
+    severity_range: [1.0, 4.0]
+    gating:                              # 야간 + 고습 + 계절업종에만 ON
+      hour_window: [0, 4]
+      humidity_min: 80.0
+      seasonal_categories: ["seasonal", "wet_meat"]
+    target_channels: ["I_leak"]
+    channel_mix: {I_leak: 1.0}
+
+  N1_inverter_falsetrip:
+    pattern: "inverter_inrush"
+    weight: 1
+    label_kind: "nuisance"
+    duration_seconds_range: [2, 8]
+    severity_range: [5.0, 15.0]
+    target_channels: ["I_load", "I_leak"]
+    requires: "has_inverter"
+    breaker_off_minutes: 5
+
+  A4_insulation_degradation:
+    # 절연 열화: 며칠 단위로 천천히 증가 + 가끔 stepwise 점프
+    pattern: "insulation_step"
+    weight: 3
+    label_kind: "range"
+    duration_minutes_range: [720, 4320]   # 12h ~ 72h
+    severity_range: [1.5, 5.0]            # final 증가율 (mA, baseline 위 절대값)
+    n_steps_range: [3, 8]
+    target_channels: ["I_leak"]
+    channel_mix: {I_leak: 1.0}
+
+  A5_water_hammer:
+    # 워터해머: P 급격 진동 + 동반 Q dip/spike
+    pattern: "water_hammer"
+    weight: 2
+    label_kind: "point_plus_range"
+    duration_seconds_range: [2, 10]
+    severity_range: [1.0, 3.0]            # bar 진동 amplitude
+    n_oscillations_range: [3, 6]
+    target_channels: ["P"]
+    channel_mix: {P: 1.0}
+
+  A6_night_leak:
+    # 야간 미세 누수: 영업 외 시간 Q baseline이 0에서 점점 상승
+    pattern: "night_leak_creep"
+    weight: 3
+    label_kind: "range_gated"
+    duration_minutes_range: [180, 480]
+    severity_range: [0.3, 1.5]            # L/min 증가량
+    gating:
+      hour_window: [23, 5]                # 23시 ~ 05시 (날짜 넘김)
+    target_channels: ["Q"]
+    channel_mix: {Q: 1.0}
+
+  A7_load_leak_coupled:
+    # 절연 열화 + 부하 의존: 부하가 켜질 때만 누설 동반 상승
+    pattern: "load_coupled_leak"
+    weight: 2
+    label_kind: "range"
+    duration_minutes_range: [180, 1440]
+    severity_range: [2.0, 6.0]            # I_leak이 I_load 비례 가산 (mA per A)
+    target_channels: ["I_leak"]
+    channel_mix: {I_leak: 1.0}
+
+# 점포별 시나리오 개수 분포: 0 ~ 6 (대부분 1~3건 발생)
+per_store_count_dist: [0.08, 0.20, 0.26, 0.22, 0.14, 0.07, 0.03]
+# 시나리오 ID 별 최소 instance 수
+min_instances_per_id: 15

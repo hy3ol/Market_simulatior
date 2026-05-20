@@ -1,0 +1,49 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# --- venv / build ---
+.venv/
+venv/
+env/
+.env
+build/
+dist/
+*.egg-info/
+
+# --- 시뮬레이션 산출물 (대용량) ---
+data/
+output_test/
+*.csv
+!config/*.csv
+*.parquet
+*.h5
+
+# --- 캐시 / 임시 ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- 에디터 / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+
+# --- 노트북 ---
+.ipynb_checkpoints/
